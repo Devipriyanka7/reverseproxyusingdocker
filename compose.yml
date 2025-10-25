@@ -1,0 +1,20 @@
+version: "3"
+services:
+  instamartsvc:
+    container_name: cont3
+    build: ./instamart
+    ports:
+      - "1111:80"
+  dineinsvc:
+    container_name: cont4
+    build: ./dinein
+    ports:
+      - "2222:80"
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - instamartsvc
+      - dineinsvc
