@@ -1,2 +1,110 @@
-<h1> this is dinein </h1>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dinein — Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent:#ff6f00;
+      --muted:#6b7280;
+      --bg:#f8f9fb;
+      font-family:'Inter',sans-serif;
+    }
+    body{margin:0;background:var(--bg);color:#111;}
+    header{position:sticky;top:0;background:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.05);z-index:50;}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--accent)}
+    .search{flex:1;margin:0 20px;display:flex;gap:8px;}
+    .search input{flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;}
+    .search button{padding:10px 14px;border:0;background:var(--accent);color:white;border-radius:8px;font-weight:600;}
+    .filters{display:flex;gap:10px;overflow-x:auto;padding:14px 24px;background:white;box-shadow:0 1px 4px rgba(0,0,0,0.03);}
+    .filter-btn{padding:8px 14px;border-radius:20px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:13px;}
+    .filter-btn.active{background:var(--accent);color:white;border-color:var(--accent);}
+    main{max-width:1200px;margin:20px auto;padding:0 20px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
+    .card{background:white;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,0.05);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s;}
+    .card:hover{transform:translateY(-3px);}
+    .card img{width:100%;height:160px;object-fit:cover;}
+    .info{padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+    .info h3{margin:0;font-size:16px;}
+    .meta{font-size:13px;color:var(--muted);}
+    .rating{font-weight:600;font-size:14px;}
+    .offer{margin-top:6px;font-size:13px;color:var(--accent);font-weight:600;}
+    @media(max-width:600px){.filters{flex-wrap:nowrap;}.card img{height:130px;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🍽️ DineIn</div>
+    <div class="search">
+      <input id="search" placeholder="Search for restaurants or cuisines">
+      <button id="searchBtn">Search</button>
+    </div>
+    <div style="font-weight:600;color:var(--accent)">Offers</div>
+  </header>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="Indian">Indian</button>
+    <button class="filter-btn" data-filter="Chinese">Chinese</button>
+    <button class="filter-btn" data-filter="Italian">Italian</button>
+    <button class="filter-btn" data-filter="Desserts">Desserts</button>
+    <button class="filter-btn" data-filter="Fast Food">Fast Food</button>
+  </div>
+
+  <main>
+    <div class="grid" id="restaurants"></div>
+  </main>
+
+  <script>
+    const restaurants=[
+      {name:"Spice Villa", cuisine:"Indian", rating:4.4, price:"₹400 for two", offer:"20% OFF", img:"https://source.unsplash.com/600x400/?indian-food"},
+      {name:"Dragon Bowl", cuisine:"Chinese", rating:4.2, price:"₹350 for two", offer:"Flat ₹100 OFF", img:"https://source.unsplash.com/600x400/?chinese-food"},
+      {name:"La Pasta Fresca", cuisine:"Italian", rating:4.6, price:"₹600 for two", offer:"10% Cashback", img:"https://source.unsplash.com/600x400/?italian-restaurant"},
+      {name:"Sweet Treats", cuisine:"Desserts", rating:4.8, price:"₹300 for two", offer:"Buy 1 Get 1", img:"https://source.unsplash.com/600x400/?dessert"},
+      {name:"Burger House", cuisine:"Fast Food", rating:4.1, price:"₹250 for two", offer:"15% OFF", img:"https://source.unsplash.com/600x400/?burger"},
+      {name:"Tandoor Tales", cuisine:"Indian", rating:4.3, price:"₹500 for two", offer:"Free dessert", img:"https://source.unsplash.com/600x400/?tandoori"},
+      {name:"Wok & Roll", cuisine:"Chinese", rating:4.5, price:"₹400 for two", offer:"Up to 30% OFF", img:"https://source.unsplash.com/600x400/?noodles"},
+      {name:"Dolce Vita", cuisine:"Italian", rating:4.7, price:"₹700 for two", offer:"Free mocktail", img:"https://source.unsplash.com/600x400/?pizza"}
+    ];
+
+    const grid=document.getElementById('restaurants');
+
+    function render(list){
+      grid.innerHTML='';
+      list.forEach(r=>{
+        const c=document.createElement('div');
+        c.className='card';
+        c.innerHTML=`<img src="${r.img}" alt="${r.name}">
+          <div class="info">
+            <h3>${r.name}</h3>
+            <div class="meta">${r.cuisine} • ${r.price}</div>
+            <div class="rating">⭐ ${r.rating}</div>
+            <div class="offer">${r.offer}</div>
+          </div>`;
+        grid.appendChild(c);
+      });
+    }
+
+    render(restaurants);
+
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+      btn.onclick=()=>{
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter=btn.dataset.filter;
+        if(filter==='all')render(restaurants);
+        else render(restaurants.filter(r=>r.cuisine===filter));
+      };
+    });
+
+    document.getElementById('searchBtn').onclick=()=>{
+      const q=document.getElementById('search').value.toLowerCase();
+      const res=restaurants.filter(r=>r.name.toLowerCase().includes(q)||r.cuisine.toLowerCase().includes(q));
+      render(res);
+    };
+  </script>
+</body>
+</html>
 
