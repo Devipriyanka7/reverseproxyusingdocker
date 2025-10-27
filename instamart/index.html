@@ -1,1 +1,229 @@
-<h1> this is instmart </h1>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Instamart-like Demo</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fff;
+      --muted:#6b7280;
+      --accent:#ff6f00; /* warm orange similar to delivery apps */
+      --card:#ffffff;
+      --glass: rgba(255,255,255,0.8);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:#f7f7fb;color:#111;font-family:Inter,Arial, sans-serif}
+
+    /* Header */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(90deg,#fff,#fff);position:sticky;top:0;z-index:40;border-bottom:1px solid #eee}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:8px;background:linear-gradient(180deg,#ff8a00,#ff5e00);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px}
+    .brand h1{margin:0;font-size:18px}
+    .search{flex:1;margin:0 20px;display:flex;align-items:center;gap:8px}
+    .search input{flex:1;padding:12px 14px;border-radius:10px;border:1px solid #e6e6f0;background:white;font-size:14px}
+    .search button{padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:600}
+
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn{padding:8px 12px;border-radius:8px;border:1px solid #eee;background:white;cursor:pointer}
+
+    /* Layout */
+    .wrap{max-width:1200px;margin:22px auto;padding:0 18px;display:grid;grid-template-columns:280px 1fr;gap:20px}
+
+    /* Sidebar categories */
+    .sidebar{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(20,20,50,0.04)}
+    .cat{display:flex;flex-direction:column;gap:8px}
+    .cat button{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;border:0;background:transparent;cursor:pointer}
+    .cat button:hover{background:#fbfbfd}
+
+    /* Main content */
+    .hero{display:flex;align-items:center;gap:18px;padding:18px;background:linear-gradient(90deg,#fff,#fff);border-radius:12px}
+    .hero .left{flex:1}
+    .hero h2{margin:0 0 8px 0;font-size:22px}
+    .hero p{margin:0;color:var(--muted)}
+
+    .categories-strip{display:flex;gap:12px;margin-top:14px;overflow:auto;padding-bottom:6px}
+    .cat-card{min-width:120px;background:linear-gradient(180deg,#fff,#fff);border-radius:10px;padding:12px;display:flex;flex-direction:column;align-items:center;border:1px solid #f0f0f6}
+    .cat-card img{width:66px;height:66px;border-radius:10px;object-fit:cover}
+    .cat-card small{margin-top:8px;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:18px}
+    .product{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(20,20,50,0.03);display:flex;flex-direction:column;gap:10px}
+    .product img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+    .product .title{font-size:14px;font-weight:600}
+    .product .meta{color:var(--muted);font-size:13px}
+    .product .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .add{padding:8px 10px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer;font-weight:600}
+
+    /* floating cart */
+    .cart{position:fixed;right:22px;bottom:22px;background:linear-gradient(90deg,#ff8a00,#ff5e00);color:white;padding:12px 16px;border-radius:12px;display:flex;gap:10px;align-items:center;box-shadow:0 12px 30px rgba(255,120,0,0.15);z-index:60}
+
+    /* responsive */
+    @media (max-width:900px){
+      .wrap{grid-template-columns:1fr;}
+      .sidebar{order:2}
+      .hero{flex-direction:column;align-items:flex-start}
+      .search{margin:12px 0}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">IM</div>
+      <div>
+        <h1>Instamart — Demo</h1>
+        <div style="font-size:12px;color:var(--muted)">Groceries delivered quick</div>
+      </div>
+    </div>
+
+    <div class="search">
+      <input id="searchInput" placeholder="Search for products, brands and more" />
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn">Offers</button>
+      <button class="btn">Sign in</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <aside class="sidebar">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <strong>Shop by category</strong>
+        <small style="color:var(--muted)">See all</small>
+      </div>
+      <div class="cat">
+        <button onclick="filterCategory('Daily Essentials')">🧻 Daily Essentials</button>
+        <button onclick="filterCategory('Fruits & Vegetables')">🍎 Fruits & Veg</button>
+        <button onclick="filterCategory('Dairy')">🥛 Dairy</button>
+        <button onclick="filterCategory('Beverages')">🥤 Beverages</button>
+        <button onclick="filterCategory('Snacks')">🍪 Snacks</button>
+        <button onclick="filterCategory('Household')">🧼 Household</button>
+      </div>
+    </aside>
+
+    <section>
+      <div class="hero">
+        <div class="left">
+          <h2>Get everything you need — delivered in 30 mins*</h2>
+          <p>Fresh groceries, snacks, beverages and daily essentials from local stores. Fast delivery and great prices.</p>
+        </div>
+        <div style="width:200px;text-align:center">
+          <img src="https://source.unsplash.com/collection/190727/300x200" style="width:100%;border-radius:12px;" alt="hero"/>
+        </div>
+      </div>
+
+      <div class="categories-strip" id="categoriesStrip" aria-hidden="false">
+        <!-- category cards injected by JS -->
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px">
+        <h3 style="margin:0">Top picks for you</h3>
+        <small style="color:var(--muted)">200+ products</small>
+      </div>
+
+      <div class="grid" id="productsGrid">
+        <!-- products injected by JS -->
+      </div>
+    </section>
+  </main>
+
+  <div class="cart" id="cartBtn">
+    <div style="font-weight:700">🛒 <span id="cartCount">0</span></div>
+    <div style="font-size:13px">View cart</div>
+  </div>
+
+  <script>
+    // Demo product data
+    const categories = [
+      {name: 'Daily Essentials', img:'https://source.unsplash.com/collection/731887/120x120'},
+      {name: 'Fruits & Vegetables', img:'https://source.unsplash.com/collection/1114848/120x120'},
+      {name: 'Dairy', img:'https://source.unsplash.com/collection/1065415/120x120'},
+      {name: 'Beverages', img:'https://source.unsplash.com/collection/1130553/120x120'},
+      {name: 'Snacks', img:'https://source.unsplash.com/collection/917405/120x120'},
+      {name: 'Household', img:'https://source.unsplash.com/collection/1587307/120x120'}
+    ];
+
+    const products = [];
+    for(let i=1;i<=18;i++){
+      const cat = categories[i%categories.length].name;
+      products.push({
+        id: 'p'+i,
+        title: cat + ' item ' + i,
+        price: (Math.floor(Math.random()*200)+20),
+        unit: '1 pc',
+        img: 'https://source.unsplash.com/collection/190727/300x300?sig='+i,
+        category: cat
+      });
+    }
+
+    const categoriesStrip = document.getElementById('categoriesStrip');
+    const productsGrid = document.getElementById('productsGrid');
+    const cartCount = document.getElementById('cartCount');
+
+    let cart = {};
+
+    function renderCategories(){
+      categories.forEach(c=>{
+        const el = document.createElement('div');
+        el.className='cat-card';
+        el.innerHTML = `<img src="${c.img}" alt="${c.name}" /><small>${c.name}</small>`;
+        el.onclick = ()=>filterCategory(c.name);
+        categoriesStrip.appendChild(el);
+      });
+    }
+
+    function renderProducts(list){
+      productsGrid.innerHTML='';
+      list.forEach(p=>{
+        const card = document.createElement('div');
+        card.className='product';
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.title}" />
+          <div class="title">${p.title}</div>
+          <div class="meta">${p.unit}</div>
+          <div class="row">
+            <div style="font-weight:700">₹${p.price}</div>
+            <button class="add" onclick="addToCart('${p.id}')">Add</button>
+          </div>
+        `;
+        productsGrid.appendChild(card);
+      });
+    }
+
+    function filterCategory(name){
+      const filtered = products.filter(p=>p.category===name);
+      renderProducts(filtered);
+      window.scrollTo({top:300,behavior:'smooth'});
+    }
+
+    function addToCart(id){
+      cart[id] = (cart[id] || 0) + 1;
+      updateCartUI();
+    }
+    function updateCartUI(){
+      const count = Object.values(cart).reduce((a,b)=>a+b,0);
+      cartCount.textContent = count;
+      // simple pulse
+      const el = document.getElementById('cartBtn');
+      el.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:250});
+    }
+
+    document.getElementById('searchBtn').addEventListener('click',()=>{
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      if(!q){renderProducts(products);return}
+      const filtered = products.filter(p=>p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+      renderProducts(filtered);
+    });
+
+    // initial render
+    renderCategories();
+    renderProducts(products);
+  </script>
+</body>
+</html>
